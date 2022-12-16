@@ -77,32 +77,20 @@ async function handleClick(event) {
     n.parentNode.removeChild(n);
   }
 
-  // We can call handLandmarker.detect as many times as we like with
+  // We can call gestureRecognizer.recognize as many times as we like with
   // different image data each time. This returns a promise
   // which we wait to complete and then call a function to
   // print out the results of the prediction.
   const results = gestureRecognizer.recognize(event.target);
-  console.log(results);
+
   if (results.gestures.length > 0) {
     const p = event.target.parentNode.childNodes[3];
     p.setAttribute('class', 'info');
     p.innerText = `GestureRecognizer: ${results.gestures[0][0].categoryName}
                    Confidence: ${Math.round(parseFloat(`${results.gestures[0][0].score}`) * 100)}%`;
-      // "GestureRecognizer: " +
-      // results.gestures[0][0].categoryName +
-      // "\n Confidence: " +
-      // Math.round(parseFloat(`${results.gestures[0][0].score}`) * 100) +
-      // "%";
     p.style.left = '0px';
     p.style.top = `${event.target.height}px`;
     p.style.width = `${event.target.width}px`;
-      // "left: 0px;" +
-      // "top: " +
-      // event.target.height +
-      // "px; " +
-      // "width: " +
-      // (event.target.width - 10) +
-      // "px;";
 
     const canvas = document.createElement('canvas') as HTMLCanvasElement;
     canvas.setAttribute('class', 'canvas');
