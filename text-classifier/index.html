@@ -1,0 +1,57 @@
+<!-- Copyright 2022 The MediaPipe Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+<!doctype html>
+<html>
+<head>
+  <!-- <base href="/"> -->
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Text Classifier</title>
+
+  <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <h1>Classifying text with the MediaPipe Text Classifier Task</h1>
+  <p>This demo runs sentiment analysis on the input text. The result shows how likely the input text is to have a positive or negative sentiment.
+
+  <h2>How to use</h2>
+  <p>Add text to the input field, and then press <b>Classify</b> to view sentiment classification.</p>
+  <p>You can <button class="mdc-button" id="populate-text">
+      <span class="mdc-button__ripple"></span>
+      <span class="mdc-button__label">POPULATE TEXT</span>
+    </button> with a default input, or add your own text.</p>
+  <p><b>Input:
+    </b>
+  </p>
+  <label class="mdc-text-field mdc-text-field--filled mdc-text-field--textarea mdc-text-field--no-label">
+    <span class="mdc-text-field__ripple"></span>
+    <span class="mdc-text-field__resizer">
+
+      <textarea id="input" class="mdc-text-field__input" rows="8" cols="40" aria-label="Text Input"></textarea>
+    </span>
+    <span class="mdc-line-ripple"></span>
+  </label></br>
+  <button id="submit" class="mdc-button mdc-button--raised">
+    <span class="mdc-button__label">CLASSIFY</span>
+  </button></br>
+
+  <p><b>Sentiment:</b></p>
+  <p id="output"></p>
+</body>
+</html>
