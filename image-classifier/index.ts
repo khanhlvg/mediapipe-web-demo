@@ -19,7 +19,7 @@ const video = document.getElementById('webcam') as HTMLVideoElement;
 const webcamPredictions = document.getElementById('webcamPredictions');
 const demosSection = document.getElementById('demos');
 let enableWebcamButton: HTMLButtonElement;
-let webcamRunning: Boolean = false;
+let webcamClassifying: Boolean = false;
 const videoHeight = '360px';
 const videoWidth = '480px';
 
@@ -34,9 +34,14 @@ for (let i = 0; i < imageContainers.length; i++) {
 // Track imageClassifier object and load status.
 let imageClassifier: ImageClassifier;
 
-/**
+const makeResultText = (classifications) => {
+  return `Classification: ${classifications[0].categories[0].displayName || classifications[0].categories[0].categoryName}
+          Confidence: ${Math.round(parseFloat(`${classifications[0].categories[0].score}`) * 100)}%`;
+}
+
+/*******************************************************
  * Demo 1: Classify images on click and display results.
- */
+ *******************************************************/
 async function handleClick(event) {
   // Do not classify if imageClassifier hasn't loaded
   if (imageClassifier === undefined) {
@@ -48,26 +53,19 @@ async function handleClick(event) {
     await imageClassifier.setOptions({ runningMode });
   }
 
-  // imageClassifier.classify() returns a promise which, when resolved, is a ClassificationResult object.
+  // imageClassifier.classify() returns a ClassificationResult synchronously.
   // Use the ClassificationResult to print out the results of the prediction.
-  const classificationResult = await imageClassifier.classify(event.target);
-  // Write the predictions to a new paragraph element and add it to the DOM.
+  const classificationResult = imageClassifier.classify(event.target);
+  // Write the classifications to a new paragraph element and add it to the DOM.
   const classifications = classificationResult.classifications;
-
   const p = event.target.parentNode.childNodes[3];
   p.className = 'classification';
-  p.innerText = `Classification: ${classifications[0].categories[0].categoryName}
-                 Confidence: ${Math.round(parseFloat(`${classifications[0].categories[0].score}`) * 100)}%`;
-    // 'Classificaton: ' +
-    // classifications[0].categories[0].categoryName +
-    // '\n Confidence: ' +
-    // Math.round(parseFloat(`${classifications[0].categories[0].score}`) * 100) +
-    // '%';
+  p.innerText = makeResultText(classifications);
 }
 
 /********************************************************************
-// Demo 2: Continuously grab image from webcam stream and classify it.
-********************************************************************/
+ * Demo 2: Continuously grab image from webcam stream and classify it.
+ ********************************************************************/
 
 // Check if webcam access is supported.
 function hasGetUserMedia() {
@@ -75,20 +73,19 @@ function hasGetUserMedia() {
 }
 
 // Get classification from the webcam
-async function predictWebcam() {
+async function classifyWebcam() {
   // Do not classify if imageClassifier hasn't loaded
   if (imageClassifier === undefined) {
     return;
   }
-  // if image mode is initialized, create a new classifier with video runningMode
+  // If image mode is initialized, create a new classifier with video runningMode
   if (runningMode === 'image') {
     runningMode = 'video';
-    // await runDemo();
-    await imageClassifier.setOptions({ runningMode: runningMode });
+    await imageClassifier.setOptions({ runningMode });
   }
-  let nowInMs = Date.now();
+  let nowInMs = performance.now();
   // Start classifying the stream.
-  const classificationResult = await imageClassifier.classifyForVideo(
+  const classificationResult = imageClassifier.classifyForVideo(
     video,
     nowInMs
   );
@@ -98,43 +95,37 @@ async function predictWebcam() {
 
   const classifications = classificationResult.classifications;
   webcamPredictions.className = 'webcamPredictions';
-  webcamPredictions.innerText = `Classification: ${classifications[0].categories[0].categoryName}
-                                 Confidence: ${Math.round(parseFloat(`${classifications[0].categories[0].score}`) * 100)}%`;
-    // 'Classification: ' +
-    // classifications[0].categories[0].categoryName +
-    // '\n Confidence: ' +
-    // Math.round(parseFloat(classifications[0].categories[0].score) * 100) +
-    // '%';
+  webcamPredictions.innerText = makeResultText(classifications);
 
-  // Call this function again to keep predicting when the browser is ready.
-  if (webcamRunning === true) {
-    window.requestAnimationFrame(predictWebcam);
+  // Call this function again to classify the next video frame
+  if (webcamClassifying === true) {
+    window.requestAnimationFrame(classifyWebcam);
   }
 }
 
-// Enable the live webcam view and start classification.
+// Enable the live webcam view and toggle classification on/off
 async function enableCam(event) {
   if (imageClassifier === undefined) {
     return;
   }
 
-  if (webcamRunning === true) {
-    webcamRunning = false;
+  if (webcamClassifying === true) {
+    webcamClassifying = false;
     enableWebcamButton.innerText = 'ENABLE PREDICTIONS';
   } else {
-    console.log('webcam was off');
-    webcamRunning = true;
+    webcamClassifying = true;
     enableWebcamButton.innerText = 'DISABLE PREDICITONS';
   }
 
-  // getUsermedia parameters.
+  // MediaStream constraints
   const constraints = {
-    video: true
+    video: true,
+    audio: false
   };
 
   // Activate the webcam stream.
   video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
-  video.addEventListener('loadeddata', predictWebcam);
+  video.addEventListener('loadeddata', classifyWebcam);
 }
 
 // If webcam supported, add event listener to button.
@@ -148,7 +139,7 @@ if (hasGetUserMedia()) {
 /**
  * Create an ImageClassifier from the given options.
  * You can replace the model with a custom one.
- * Customize your model at [url of MPStudio]
+ * Customize your model at http://studio.mediapipe.dev/
  */
 async function runDemo() {
   const vision = await FilesetResolver.forVisionTasks('/wasm');
