@@ -27,19 +27,25 @@ limitations under the License. -->
   <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Face landmark detection using the MediaPipe FaceMesh task</h1>
+  <h1>Face direction using the MediaPipe FaceMesh task</h1>
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
-      <div class="mdc-layout-grid__cell--span-6">
-        <video class="input-video" id="input-video"></video>
+      <div class="mdc-layout-grid__cell--span-5">
+        <div class="output-wrapper">
+          <canvas class="output-canvas" id="output-canvas" width="720px" height="480px"></canvas>
+        </div>
+        <div class="result" id="result"></div>
       </div>
-      <div class="mdc-layout-grid__cell--span-6">
-        <canvas class="output-canvas" id="output-canvas" width="480px" height="360px"></canvas>
+      <div class="mdc-layout-grid__cell--span-7">
+        <video class="input-video" id="input-video"></video>
+        <div class="output-screen">
+          <span class="output-point"></span>
+        </div>
       </div>
     </div>
   </div>
   <div class="result">
-    <p id="result"></p>
+    
   </div>
 </body>
 </html>

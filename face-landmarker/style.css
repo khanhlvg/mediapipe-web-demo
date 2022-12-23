@@ -60,6 +60,58 @@ section {
 .result {
   text-align: center;
   font-size: 24px;
+  padding: 16px;
+}
+.input-video {
+  display: none;
+}
+
+.output-wrapper {
+  position: relative;
+}
+
+.output-wrapper::after {
+  position: absolute;
+  content: "";
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  border: 80px solid transparent;
+}
+.output-wrapper.top::after {
+  border-top-color: rgba(0, 255, 0, 0.4);
+}
+.output-wrapper.left::after {
+  border-left-color: rgba(0, 255, 0, 0.4);
+}
+.output-wrapper.right::after {
+  border-right-color: rgba(0, 255, 0, 0.4);
+}
+.output-wrapper.bottom::after {
+  border-bottom-color: rgba(0, 255, 0, 0.4);
+}
+
+.output-screen {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  width: 720px;
+  height: 480px;
+  margin: 0 auto;
+  border: 1px solid #000;
+}
+
+.output-point {
+  position: absolute;
+  display: block;
+  width: 8px;
+  height: 8px;
+  top: calc(50% - 4px);
+  left: calc(50% - 4px);
+  background-color: #000;
 }
 
 /* .removed {
