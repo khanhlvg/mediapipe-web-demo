@@ -1,7 +1,7 @@
 {
-  "name": "face-landmarker",
+  "name": "face-direction",
   "version": "1.0.0",
-  "description": "Face landmarker demo",
+  "description": "Face direction demo",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --output-pathinfo --progress",

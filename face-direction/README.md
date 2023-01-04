@@ -1,4 +1,4 @@
-# Face landmarker demo
+# Face direction demo
 
 ## Installation
 
