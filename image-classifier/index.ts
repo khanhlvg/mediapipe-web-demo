@@ -72,6 +72,9 @@ function hasGetUserMedia() {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 }
 
+// Tranking previous time of webcam
+let preInMs = 0;
+
 // Get classification from the webcam
 async function classifyWebcam() {
   // Do not classify if imageClassifier hasn't loaded
@@ -83,19 +86,24 @@ async function classifyWebcam() {
     runningMode = 'video';
     await imageClassifier.setOptions({ runningMode });
   }
-  let nowInMs = performance.now();
-  // Start classifying the stream.
-  const classificationResult = imageClassifier.classifyForVideo(
-    video,
-    nowInMs
-  );
-  video.style.height = videoHeight;
-  video.style.width = videoWidth;
-  webcamPredictions.style.width = videoWidth;
 
-  const classifications = classificationResult.classifications;
-  webcamPredictions.className = 'webcamPredictions';
-  webcamPredictions.innerText = makeResultText(classifications);
+  // Get cuurent time of webcame
+  const nowInMs = video.currentTime;
+  if (nowInMs > preInMs) {
+    preInMs = nowInMs;
+    // Start classifying the stream.
+    const classificationResult = imageClassifier.classifyForVideo(
+      video,
+      nowInMs
+    );
+    video.style.height = videoHeight;
+    video.style.width = videoWidth;
+    webcamPredictions.style.width = videoWidth;
+  
+    const classifications = classificationResult.classifications;
+    webcamPredictions.className = 'webcamPredictions';
+    webcamPredictions.innerText = makeResultText(classifications);
+  }
 
   // Call this function again to classify the next video frame
   if (webcamClassifying === true) {
