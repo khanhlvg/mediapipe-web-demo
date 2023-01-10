@@ -87,7 +87,7 @@ async function classifyWebcam() {
     await imageClassifier.setOptions({ runningMode });
   }
 
-  // Get cuurent time of webcame
+  // Get current time of webcame
   const nowInMs = video.currentTime;
   if (nowInMs > preInMs) {
     preInMs = nowInMs;
