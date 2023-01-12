@@ -13,6 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 @use "@material";
+@use "@material/floating-label/mdc-floating-label";
+@use "@material/line-ripple/mdc-line-ripple";
+@use "@material/notched-outline/mdc-notched-outline";
+@use "@material/textfield";
+@use "@material/slider/styles";
+
 body {
   font-family: helvetica, arial, sans-serif;
   margin: 2em;
@@ -112,6 +118,42 @@ section {
   top: calc(50% - 4px);
   left: calc(50% - 4px);
   background-color: #000;
+}
+
+.form-controller {
+  padding: 32px 0;
+}
+.form-group {
+  margin-bottom: 24px;
+}
+
+.txt-center {
+  text-align: center;
+}
+
+.mouse-simulation {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  width: 80px;
+  height: 100px;
+  border: 2px solid #000000;
+  border-radius: 38px;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+}
+.mouse-simulation-left,
+.mouse-simulation-right {
+  display: flex;
+  width: 38px;
+  background-color: transparent;
+  border: 1px solid #000000;
+}
+.mouse-simulation-body {
+  display: flex;
+  width: 100%;
+  border: 1px solid #000000;
 }
 
 /* .removed {

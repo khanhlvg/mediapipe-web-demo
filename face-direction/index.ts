@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import { drawConnectors } from '@mediapipe/drawing_utils';
-import { FaceMesh, FACEMESH_RIGHT_EYE, FACEMESH_LEFT_EYE, FACEMESH_TESSELATION, FACEMESH_RIGHT_IRIS, FACEMESH_LEFT_IRIS } from '@mediapipe/face_mesh';
+import { FaceMesh, FACEMESH_RIGHT_EYE, FACEMESH_LEFT_EYE, FACEMESH_TESSELATION, FACEMESH_RIGHT_IRIS, FACEMESH_LEFT_IRIS, FACEMESH_FACE_OVAL } from '@mediapipe/face_mesh';
 import { Camera } from '@mediapipe/camera_utils'
+import { MDCSlider } from '@material/slider';
 
 const videoElement = document.getElementById('input-video') as HTMLVideoElement;
 const canvasElement = document.getElementById('output-canvas') as HTMLCanvasElement;
@@ -23,21 +24,63 @@ const resultEl = document.getElementById('result');
 const outputWrapper = document.getElementsByClassName('output-wrapper')[0] as HTMLElement;
 const outputScreen = document.getElementsByClassName('output-screen')[0] as HTMLElement;
 const outputPoint = document.getElementsByClassName('output-point')[0] as HTMLElement;
+const mouseLeftEl = document.getElementsByClassName('mouse-simulation-left')[0] as HTMLElement;
+const mouseRightEl = document.getElementsByClassName('mouse-simulation-right')[0] as HTMLElement;
 
-const SCREEN_WIDTH = 720;
+let SCREEN_WIDTH = 720;
 const SCREEN_HEIGHT = 480;
-const BLINK_THRESHOLD = 10;
+const BLINK_THRESHOLD = 5;
+const DIRECTION_THRESHOLD = 0.08;
+const BLINK_TIME = 500; // Unit: ms
+const FRAME_TIME = 33.333333; // ms, FPS = 30
+
+// Controller
+const sliderDirectionThreshold = new MDCSlider(document.querySelector('.slider-head-direction'));
+const sliderEyeClosedThreshold = new MDCSlider(document.querySelector('.slider-eye-close'));
+const sliderEyeClosedTimer = new MDCSlider(document.querySelector('.slider-eye-close-timer'));
+const txtDirectionThreshold = document.getElementsByClassName('slider-head-direction-value')[0] as HTMLElement;
+const txtEyeClosedThreshold = document.getElementsByClassName('slider-eye-close-value')[0] as HTMLElement;
+const txtEyeClosedTimer = document.getElementsByClassName('slider-eye-close-timer-value')[0] as HTMLElement;
+
+// Controller events
+sliderDirectionThreshold.listen('MDCSlider:change', () => {
+  txtDirectionThreshold.innerHTML = `${sliderDirectionThreshold.getValue()}`;
+});
+sliderEyeClosedThreshold.listen('MDCSlider:change', () => {
+  txtEyeClosedThreshold.innerHTML = `${sliderEyeClosedThreshold.getValue()}`;
+});
+sliderEyeClosedTimer.listen('MDCSlider:change', () => {
+  txtEyeClosedTimer.innerHTML = `${sliderEyeClosedTimer.getValue()}`;
+});
+
+// Close eyes controller variables
+let frameRightClose = 0;
+let frameLeftClose = 0;
+
+// Detect width of simulation screen depend on the device
+const detectSimulationScreen = () => {
+  if (outputScreen) {
+    SCREEN_WIDTH = outputScreen.offsetWidth - 2; // 2px of borders
+  }
+};
+detectSimulationScreen();
+
+// Set default thresholds
+sliderDirectionThreshold.setValue(DIRECTION_THRESHOLD);
+sliderEyeClosedThreshold.setValue(BLINK_THRESHOLD);
+sliderEyeClosedTimer.setValue(BLINK_TIME);
 
 const distance2Points = (point1, point2) => {
   return Math.sqrt((point2.x - point1.x)**2 + (point2.y - point1.y)**2 + (point2.z - point1.z)**2);
-}
+};
 
 const detectDirection = (top, left, right, bottom) => {
+  const threshold = sliderDirectionThreshold.getValue();
   return [
-    top.z - bottom.z > 0.1 ? 'top' : '',
-    top.z - bottom.z < -0.08 ? 'bottom' : '',
-    left.z - right.z > 0.08 ? 'left' : '',
-    left.z - right.z < -0.08 ? 'right' : ''
+    top.z - bottom.z > threshold ? 'top' : '',
+    top.z - bottom.z < -threshold ? 'bottom' : '',
+    left.z - right.z > threshold ? 'left' : '',
+    left.z - right.z < -threshold ? 'right' : ''
   ].filter(v => v).join('-');
 };
 
@@ -82,7 +125,31 @@ const calculateBlinkRatio = (landmarks, rightEyePoints = FACEMESH_RIGHT_EYE, lef
   const lv = distance2Points(lt, lb);
 
   const blinkRatio = ((rh / rv) + (lh / lv)) / 2;
-  return blinkRatio;
+  return {
+    rightBlink: rh / rv,
+    leftBlink: lh / lv,
+    eyesBlink: blinkRatio
+  };
+};
+
+const detectCloseEyes = (blinkRatio) => {
+  if (!blinkRatio) {
+    frameLeftClose = 0;
+    frameRightClose = 0;
+    return;
+  }
+
+  const eyeCloseThreshold = sliderEyeClosedThreshold.getValue();
+  const isLeftBlink = blinkRatio.leftBlink > eyeCloseThreshold;
+  const isRightBlink = blinkRatio.rightBlink > eyeCloseThreshold;
+  if (!blinkRatio.leftBlink || !isLeftBlink) {
+    frameLeftClose = 0;
+  }
+  if (!blinkRatio.rightBlink || !isRightBlink) {
+    frameRightClose = 0;
+  } 
+  frameLeftClose += +isLeftBlink;
+  frameRightClose += +isRightBlink;
 };
 
 const onResults = (results) => {
@@ -105,30 +172,45 @@ const onResults = (results) => {
     });
 
     // Eyes blink detector
+    const blinkTime = sliderEyeClosedTimer.getValue();
     const blinkRatio = calculateBlinkRatio(results.multiFaceLandmarks[0]);
-    outputScreen.style.backgroundColor = blinkRatio > BLINK_THRESHOLD ? '#FF3030' : 'transparent';
-    resultEl.innerHTML = 'Blink ratio: ' + calculateBlinkRatio(results.multiFaceLandmarks[0]).toFixed(3);
+
+    // Detect close eyes for clicking computer mouse
+    detectCloseEyes(blinkRatio);
+    mouseLeftEl.style.backgroundColor = frameLeftClose * FRAME_TIME > blinkTime ? '#30FF30' : 'transparent';
+    mouseRightEl.style.backgroundColor = frameRightClose * FRAME_TIME > blinkTime ? '#FF3030' : 'transparent';
+    // outputScreen.style.backgroundColor =
+    // frameRightClose * FRAME_TIME > blinkTime
+    //   ? '#FF3030'
+    //   : (frameLeftClose * FRAME_TIME > blinkTime ? '#30FF30' : 'transparent');
+    // resultEl.innerHTML = 'Blink ratio: ' + calculateBlinkRatio(results.multiFaceLandmarks[0]).toFixed(3);
     
     // Draw face landmark
     for (const landmarks of results.multiFaceLandmarks) {
       // drawConnectors(canvasCtx, landmarks, FACEMESH_TESSELATION, {color: '#C0C0C070', lineWidth: 1});
-      // drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYE, {color: '#FF3030', lineWidth: 2});
+      drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYE, {color: '#FF3030', lineWidth: 1});
       // drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_EYEBROW, {color: '#FF3030', lineWidth: 2});
       // drawConnectors(canvasCtx, landmarks, FACEMESH_RIGHT_IRIS, {color: '#FF3030', lineWidth: 2});
-      // drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYE, {color: '#30FF30', lineWidth: 2});
+      drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYE, {color: '#30FF30', lineWidth: 1});
       // drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_EYEBROW, {color: '#30FF30', lineWidth: 2});
       // drawConnectors(canvasCtx, landmarks, FACEMESH_LEFT_IRIS, {color: '#30FF30', lineWidth: 2});
       // drawConnectors(canvasCtx, landmarks, FACEMESH_LIPS, {color: '#E0E0E0', lineWidth: 2});
-      // drawConnectors(canvasCtx, landmarks, FACEMESH_FACE_OVAL, {color: '#E0E0E0'});
+      drawConnectors(canvasCtx, landmarks, FACEMESH_FACE_OVAL, {color: '#E0E0E0', lineWidth: 1});
 
       // drawConnectors(canvasCtx, landmarks, [[FACEMESH_RIGHT_EYE[0][0], FACEMESH_RIGHT_EYE[7][1]]], {color: '#E0E0E0', lineWidth: 2});
       // drawConnectors(canvasCtx, landmarks, [[FACEMESH_RIGHT_EYE[4][0], FACEMESH_RIGHT_EYE[12][0]]], {color: '#E0E0E0', lineWidth: 2});
     }
 
+    const facePoints = [
+      results.multiFaceLandmarks[0][10],
+      results.multiFaceLandmarks[0][323],
+      results.multiFaceLandmarks[0][93],
+      results.multiFaceLandmarks[0][152]
+    ]
     // Example draw key points
-    for (const key of results.multiFaceLandmarks[0]) {
+    for (const key of facePoints) {
       canvasCtx.beginPath();
-      canvasCtx.arc(key.x * SCREEN_WIDTH, key.y * SCREEN_HEIGHT, 1, 0, 2 * Math.PI);
+      canvasCtx.arc(key.x * SCREEN_WIDTH, key.y * SCREEN_HEIGHT, 3, 0, 2 * Math.PI);
       canvasCtx.fillStyle = '#30FF30';
       canvasCtx.fill();
     }
@@ -151,7 +233,7 @@ const camera = new Camera(videoElement, {
   onFrame: async () => {
     await faceMesh.send({image: videoElement});
   },
-  width: SCREEN_WIDTH,
+  width: 720,
   height: SCREEN_HEIGHT
 });
 camera.start();

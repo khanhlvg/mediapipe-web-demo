@@ -27,20 +27,94 @@ limitations under the License. -->
   <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Face direction using the MediaPipe FaceMesh task</h1>
+  <h1>[Demo] Mouse control through head direction and eyes closed.</h1>
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
       <div class="mdc-layout-grid__cell--span-5">
         <div class="output-wrapper">
           <canvas class="output-canvas" id="output-canvas" width="720px" height="480px"></canvas>
         </div>
+        <form class="form-controller">
+          <div class="form-group">
+            <label class="form-label">Head direction threshold: <strong class="slider-head-direction-value">0.08</strong></label>
+            <div class="mdc-slider mdc-slider--discrete slider-head-direction">
+              <input class="mdc-slider__input" type="range" min="0.05" max="0.15" value="0.08" name="volume" step="0.01" aria-label="Head direction slider">
+              <div class="mdc-slider__track">
+                <div class="mdc-slider__track--inactive"></div>
+                <div class="mdc-slider__track--active">
+                  <div class="mdc-slider__track--active_fill"></div>
+                </div>
+              </div>
+              <div class="mdc-slider__thumb">
+                <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                  <div class="mdc-slider__value-indicator">
+                    <span class="mdc-slider__value-indicator-text">
+                      50
+                    </span>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb-knob"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Eye close detection threshold: <strong class="slider-eye-close-value">5</strong></label>
+            <div class="mdc-slider mdc-slider--discrete slider-eye-close">
+              <input class="mdc-slider__input" type="range" min="2" max="10" value="5" name="volume" step="1" aria-label="Eye close slider">
+              <div class="mdc-slider__track">
+                <div class="mdc-slider__track--inactive"></div>
+                <div class="mdc-slider__track--active">
+                  <div class="mdc-slider__track--active_fill"></div>
+                </div>
+              </div>
+              <div class="mdc-slider__thumb">
+                <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                  <div class="mdc-slider__value-indicator">
+                    <span class="mdc-slider__value-indicator-text">
+                      50
+                    </span>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb-knob"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Eye close time threshold (ms): <strong class="slider-eye-close-timer-value">500</strong></label>
+            <div class="mdc-slider mdc-slider--discrete slider-eye-close-timer">
+              <input class="mdc-slider__input" type="range" min="100" max="1000" value="500" name="volume" step="100" aria-label="Eye close timer">
+              <div class="mdc-slider__track">
+                <div class="mdc-slider__track--inactive"></div>
+                <div class="mdc-slider__track--active">
+                  <div class="mdc-slider__track--active_fill"></div>
+                </div>
+              </div>
+              <div class="mdc-slider__thumb">
+                <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                  <div class="mdc-slider__value-indicator">
+                    <span class="mdc-slider__value-indicator-text">
+                      50
+                    </span>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb-knob"></div>
+              </div>
+            </div>
+          </div>
+        </form>
         <div class="result" id="result"></div>
       </div>
       <div class="mdc-layout-grid__cell--span-7">
         <video class="input-video" id="input-video"></video>
         <div class="output-screen">
           <span class="output-point"></span>
+          <div class="mouse-simulation">
+            <div class="mouse-simulation-left"></div>
+            <div class="mouse-simulation-right"></div>
+            <div class="mouse-simulation-body"></div>
+          </div>
         </div>
+        <h3 class="txt-center">Screen simulation</h3>
       </div>
     </div>
   </div>
