@@ -1,0 +1,58 @@
+<!-- Copyright 2022 The MediaPipe Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Image Classifier</title>
+
+  <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <h1>Classifying images using the MediaPipe Image Classifier Task</h1>
+
+  <section id="demos" class="invisible">
+    <h2>Demo: Classify Images</h2>
+    <p><b>Click on an image below</b> to see its classification.</p>
+    <div class="classifyOnClick">
+      <img src="https://assets.codepen.io/9177687/dog_flickr_publicdomain.jpeg" width="100%" crossorigin="anonymous" title="Click to get classification!" />
+      <p class="classification removed">
+      </p>
+    </div>
+    <div class="classifyOnClick">
+      <img src="https://assets.codepen.io/9177687/cat_flickr_publicdomain.jpeg" width="100%" crossorigin="anonymous" title="Click to get classification!" />
+      <p class="classification removed">
+      </p>
+    </div>
+
+    <h2>Demo: Webcam continuous classification</h2>
+    <p>Hold some objects up close to your webcam to get real-time classification. For best results, avoid having too many objects visible to the camera.</br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
+
+    <div class="webcam">
+      <button id="webcamButton" class="mdc-button mdc-button--raised">
+        <span class="mdc-button__ripple"></span>
+        <span class="mdc-button__label">ENABLE WEBCAM</span>
+      </button>
+      <video id="webcam" autoplay playsinline></video>
+      <p id="webcamPredictions" class="webcamPredictions removed"></p>
+    </div>
+  </section>
+</body>
+</html>
