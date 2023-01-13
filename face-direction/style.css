@@ -22,6 +22,8 @@ limitations under the License. */
 body {
   font-family: helvetica, arial, sans-serif;
   margin: 2em;
+  padding: 0;
+  border: 0;
   color: #3d3d3d;
   --mdc-theme-primary: #007f8b;
   --mdc-theme-on-primary: #f1f3f4;
@@ -130,10 +132,16 @@ section {
 .txt-center {
   text-align: center;
 }
+.flex-space-between {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 16px 0;
+  margin-bottom: -8px;
+}
 
 .mouse-simulation {
   position: absolute;
-  left: 16px;
+  left: 136px;
   bottom: 16px;
   width: 80px;
   height: 100px;
@@ -154,6 +162,55 @@ section {
   display: flex;
   width: 100%;
   border: 1px solid #000000;
+}
+
+.arrow-simulation {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  left: 32px;
+  bottom: 32px;
+  width: 70px;
+  height: 70px;
+  border: 2px solid #000000;
+  transform: rotateZ(45deg);
+}
+.arrow-simulation-body {
+  position: absolute;
+  left: 9px;
+  bottom: 9px;
+  width: 48px;
+  height: 48px;
+  background-color: #ffffff;
+  border: 2px solid #000000;
+  transform: rotateZ(45deg);
+  z-index: 1;
+}
+.arrow-simulation-top,
+.arrow-simulation-left,
+.arrow-simulation-right,
+.arrow-simulation-bottom {
+  width: 50%;
+}
+
+.arrow-simulation.top .arrow-simulation-top {
+  background-color: #30FF30;
+}
+.arrow-simulation.left .arrow-simulation-left {
+  background-color: #30FF30;
+}
+.arrow-simulation.right .arrow-simulation-right {
+  background-color: #30FF30;
+}
+.arrow-simulation.bottom .arrow-simulation-bottom {
+  background-color: #30FF30;
+}
+
+.guideline {
+  text-align: center;
+}
+.guideline img {
+  width: 80%;
 }
 
 /* .removed {

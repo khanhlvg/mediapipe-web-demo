@@ -26,6 +26,7 @@ const outputScreen = document.getElementsByClassName('output-screen')[0] as HTML
 const outputPoint = document.getElementsByClassName('output-point')[0] as HTMLElement;
 const mouseLeftEl = document.getElementsByClassName('mouse-simulation-left')[0] as HTMLElement;
 const mouseRightEl = document.getElementsByClassName('mouse-simulation-right')[0] as HTMLElement;
+const arrowsSimulation = document.getElementsByClassName('arrow-simulation')[0] as HTMLElement;
 
 let SCREEN_WIDTH = 720;
 const SCREEN_HEIGHT = 480;
@@ -79,8 +80,10 @@ const detectDirection = (top, left, right, bottom) => {
   return [
     top.z - bottom.z > threshold ? 'top' : '',
     top.z - bottom.z < -threshold ? 'bottom' : '',
-    left.z - right.z > threshold ? 'left' : '',
-    left.z - right.z < -threshold ? 'right' : ''
+    // left.z - right.z > threshold ? 'left' : '',
+    // left.z - right.z < -threshold ? 'right' : ''
+    top.x - bottom.x > threshold ? 'left' : '',
+    top.x - bottom.x < -threshold ? 'right' : ''
   ].filter(v => v).join('-');
 };
 
@@ -166,9 +169,13 @@ const onResults = (results) => {
       results.multiFaceLandmarks[0][152]
     ) || 'center';
     drawPoint(direction);
-    outputWrapper.className = 'output-wrapper';
+    // outputWrapper.className = 'output-wrapper';
+    // direction.split('-').filter(i => i !== 'center').map((item) => {
+    //   outputWrapper.classList.add(item);
+    // });
+    arrowsSimulation.className = 'arrow-simulation';
     direction.split('-').filter(i => i !== 'center').map((item) => {
-      outputWrapper.classList.add(item);
+      arrowsSimulation.classList.add(item);
     });
 
     // Eyes blink detector

@@ -26,6 +26,7 @@ const commonConfig = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'node_modules/@mediapipe/face_mesh', to: 'face_mesh' },
+        { from: 'images', to: 'images' },
         'style.css'
       ]
     }),

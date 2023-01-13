@@ -37,6 +37,10 @@ limitations under the License. -->
         <form class="form-controller">
           <div class="form-group">
             <label class="form-label">Head direction threshold: <strong class="slider-head-direction-value">0.08</strong></label>
+            <div class="flex-space-between">
+              <span>0.05</span>
+              <span>0.15</span>
+            </div>
             <div class="mdc-slider mdc-slider--discrete slider-head-direction">
               <input class="mdc-slider__input" type="range" min="0.05" max="0.15" value="0.08" name="volume" step="0.01" aria-label="Head direction slider">
               <div class="mdc-slider__track">
@@ -59,6 +63,10 @@ limitations under the License. -->
           </div>
           <div class="form-group">
             <label class="form-label">Eye close detection threshold: <strong class="slider-eye-close-value">5</strong></label>
+            <div class="flex-space-between">
+              <span>2</span>
+              <span>10</span>
+            </div>
             <div class="mdc-slider mdc-slider--discrete slider-eye-close">
               <input class="mdc-slider__input" type="range" min="2" max="10" value="5" name="volume" step="1" aria-label="Eye close slider">
               <div class="mdc-slider__track">
@@ -81,6 +89,10 @@ limitations under the License. -->
           </div>
           <div class="form-group">
             <label class="form-label">Eye close time threshold (ms): <strong class="slider-eye-close-timer-value">500</strong></label>
+            <div class="flex-space-between">
+              <span>100</span>
+              <span>1000</span>
+            </div>
             <div class="mdc-slider mdc-slider--discrete slider-eye-close-timer">
               <input class="mdc-slider__input" type="range" min="100" max="1000" value="500" name="volume" step="100" aria-label="Eye close timer">
               <div class="mdc-slider__track">
@@ -102,7 +114,6 @@ limitations under the License. -->
             </div>
           </div>
         </form>
-        <div class="result" id="result"></div>
       </div>
       <div class="mdc-layout-grid__cell--span-7">
         <video class="input-video" id="input-video"></video>
@@ -113,13 +124,20 @@ limitations under the License. -->
             <div class="mouse-simulation-right"></div>
             <div class="mouse-simulation-body"></div>
           </div>
+          <div class="arrow-simulation">
+            <div class="arrow-simulation-top"></div>
+            <div class="arrow-simulation-right"></div>
+            <div class="arrow-simulation-left"></div>
+            <div class="arrow-simulation-bottom"></div>
+            <div class="arrow-simulation-body"></div>
+          </div>
         </div>
         <h3 class="txt-center">Screen simulation</h3>
+        <div class="guideline">
+          <img src="/images/guideline.png" alt="Guideline">
+        </div>
       </div>
     </div>
-  </div>
-  <div class="result">
-    
   </div>
 </body>
 </html>
