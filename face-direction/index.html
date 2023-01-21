@@ -1,0 +1,143 @@
+<!-- Copyright 2022 The MediaPipe Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+<!doctype html>
+<html>
+<head>
+  <!-- <base href="/"> -->
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Face direction</title>
+
+  <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <h1>[Demo] Mouse control through head direction and eyes closed.</h1>
+  <div class="mdc-layout-grid">
+    <div class="mdc-layout-grid__inner">
+      <div class="mdc-layout-grid__cell--span-5">
+        <div class="output-wrapper">
+          <canvas class="output-canvas" id="output-canvas" width="720px" height="480px"></canvas>
+        </div>
+        <form class="form-controller">
+          <div class="form-group">
+            <label class="form-label">Head direction threshold: <strong class="slider-head-direction-value">0.08</strong></label>
+            <div class="flex-space-between">
+              <span>0.05</span>
+              <span>0.15</span>
+            </div>
+            <div class="mdc-slider mdc-slider--discrete slider-head-direction">
+              <input class="mdc-slider__input" type="range" min="0.05" max="0.15" value="0.08" name="volume" step="0.01" aria-label="Head direction slider">
+              <div class="mdc-slider__track">
+                <div class="mdc-slider__track--inactive"></div>
+                <div class="mdc-slider__track--active">
+                  <div class="mdc-slider__track--active_fill"></div>
+                </div>
+              </div>
+              <div class="mdc-slider__thumb">
+                <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                  <div class="mdc-slider__value-indicator">
+                    <span class="mdc-slider__value-indicator-text">
+                      50
+                    </span>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb-knob"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Eye close detection threshold: <strong class="slider-eye-close-value">5</strong></label>
+            <div class="flex-space-between">
+              <span>2</span>
+              <span>10</span>
+            </div>
+            <div class="mdc-slider mdc-slider--discrete slider-eye-close">
+              <input class="mdc-slider__input" type="range" min="2" max="10" value="5" name="volume" step="1" aria-label="Eye close slider">
+              <div class="mdc-slider__track">
+                <div class="mdc-slider__track--inactive"></div>
+                <div class="mdc-slider__track--active">
+                  <div class="mdc-slider__track--active_fill"></div>
+                </div>
+              </div>
+              <div class="mdc-slider__thumb">
+                <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                  <div class="mdc-slider__value-indicator">
+                    <span class="mdc-slider__value-indicator-text">
+                      50
+                    </span>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb-knob"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Eye close time threshold (ms): <strong class="slider-eye-close-timer-value">500</strong></label>
+            <div class="flex-space-between">
+              <span>100</span>
+              <span>1000</span>
+            </div>
+            <div class="mdc-slider mdc-slider--discrete slider-eye-close-timer">
+              <input class="mdc-slider__input" type="range" min="100" max="1000" value="500" name="volume" step="100" aria-label="Eye close timer">
+              <div class="mdc-slider__track">
+                <div class="mdc-slider__track--inactive"></div>
+                <div class="mdc-slider__track--active">
+                  <div class="mdc-slider__track--active_fill"></div>
+                </div>
+              </div>
+              <div class="mdc-slider__thumb">
+                <div class="mdc-slider__value-indicator-container" aria-hidden="true">
+                  <div class="mdc-slider__value-indicator">
+                    <span class="mdc-slider__value-indicator-text">
+                      50
+                    </span>
+                  </div>
+                </div>
+                <div class="mdc-slider__thumb-knob"></div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="mdc-layout-grid__cell--span-7">
+        <video class="input-video" id="input-video"></video>
+        <div class="output-screen">
+          <span class="output-point"></span>
+          <div class="mouse-simulation">
+            <div class="mouse-simulation-left"></div>
+            <div class="mouse-simulation-right"></div>
+            <div class="mouse-simulation-body"></div>
+          </div>
+          <div class="arrow-simulation">
+            <div class="arrow-simulation-top"></div>
+            <div class="arrow-simulation-right"></div>
+            <div class="arrow-simulation-left"></div>
+            <div class="arrow-simulation-bottom"></div>
+            <div class="arrow-simulation-body"></div>
+          </div>
+        </div>
+        <h3 class="txt-center">Screen simulation</h3>
+        <div class="guideline">
+          <img src="/images/guideline.png" alt="Guideline">
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
