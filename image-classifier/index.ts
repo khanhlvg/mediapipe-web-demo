@@ -24,7 +24,7 @@ const videoHeight = '360px';
 const videoWidth = '480px';
 
 const imageContainers = document.getElementsByClassName('classifyOnClick');
-let runningMode: 'image' | 'video' = 'image';
+let runningMode: 'IMAGE' | 'VIDEO' = 'IMAGE';
 
 // Add click event listeners for the img elements.
 for (let i = 0; i < imageContainers.length; i++) {
@@ -48,8 +48,8 @@ async function handleClick(event) {
     return;
   }
   // if video mode is initialized, set runningMode to image
-  if (runningMode === 'video') {
-    runningMode = 'image';
+  if (runningMode === 'VIDEO') {
+    runningMode = 'IMAGE';
     await imageClassifier.setOptions({ runningMode });
   }
 
@@ -82,8 +82,8 @@ async function classifyWebcam() {
     return;
   }
   // If image mode is initialized, create a new classifier with video runningMode
-  if (runningMode === 'image') {
-    runningMode = 'video';
+  if (runningMode === 'IMAGE') {
+    runningMode = 'VIDEO';
     await imageClassifier.setOptions({ runningMode });
   }
 
