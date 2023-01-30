@@ -18,6 +18,6 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "@mediapipe/tasks-vision": "0.1.0-alpha-1"
+    "@mediapipe/tasks-vision": "0.1.0-alpha-3"
   }
 }
