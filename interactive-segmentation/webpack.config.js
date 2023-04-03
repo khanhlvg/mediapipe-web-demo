@@ -42,7 +42,7 @@ const developmentConfig = {
   devtool: "inline-source-map",
   mode: "development",
   devServer: {
-    port: 3000
+    port: 3002
   }
 };
 

@@ -68,8 +68,8 @@ async function handleClick(event) {
       }
     },
     (masks, width, height) => {
-      console.log(masks, width, height);
       drawSegmentation(masks[0], width, height, event.target.parentElement);
+      drawClickPoint(event.target.parentElement, event);
     }
   );
 }
@@ -78,7 +78,7 @@ async function handleClick(event) {
  * Draw segmentation
  */
 function drawSegmentation(masks, width: number, height: number, el: HTMLElement) {
-  const canvas = document.getElementsByClassName('canvas-segmentation')[0] as HTMLCanvasElement;
+  const canvas = el.getElementsByClassName('canvas-segmentation')[0] as HTMLCanvasElement;
   canvas.width = width;
   canvas.height = height;
 
@@ -99,4 +99,13 @@ function drawSegmentation(masks, width: number, height: number, el: HTMLElement)
   el.appendChild(canvas);
 };
 
-// ctx.fillRect(10,10,1,1); // fill in the pixel at (10,10)
+/**
+ * Draw click point
+ */
+function drawClickPoint(el: HTMLElement, event: MouseEvent) {
+  const clickPoint = el.getElementsByClassName('click-point')[0] as HTMLElement;
+  // console.log(el.offsetWidth, el.offsetHeight);
+  clickPoint.style.top = `${event.offsetY - 8}px`;
+  clickPoint.style.left = `${event.offsetX - 8}px`;
+  clickPoint.style.display = 'block';
+}
