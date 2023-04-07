@@ -67,7 +67,8 @@ footer {
 }
 
 .videoView,
-.detectOnClick {
+.detectOnClick,
+.blend-shapes {
   position: relative;
   float: left;
   width: 48%;
@@ -112,4 +113,25 @@ footer {
 
 .detectOnClick img {
   width: 100%;
+}
+
+.blend-shapes-item {
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.blend-shapes-label {
+  display: flex;
+  width: 120px;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.blend-shapes-value {
+  display: flex;
+  height: 16px;
+  align-items: center;
+  background-color: #007f8b;
 }

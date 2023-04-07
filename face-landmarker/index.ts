@@ -17,6 +17,9 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { FACEMESH_FACE_OVAL, FACEMESH_LEFT_EYE, FACEMESH_LEFT_EYEBROW, FACEMESH_LEFT_IRIS, FACEMESH_LIPS, FACEMESH_RIGHT_EYE, FACEMESH_RIGHT_EYEBROW, FACEMESH_RIGHT_IRIS, FACEMESH_TESSELATION } from '@mediapipe/face_mesh';
 
 const demosSection = document.getElementById('demos');
+const imageBlendShapes = document.getElementById('image-blend-shapes');
+const videoBlendShapes = document.getElementById('video-blend-shapes');
+
 
 let faceLandmarker;
 let runningMode: 'IMAGE' | 'VIDEO' = 'IMAGE';
@@ -36,6 +39,7 @@ async function runDemo() {
       modelAssetPath: `https://storage.googleapis.com/mediapipe-assets/face_landmarker_with_blendshapes.task?generation=1678504998301299`,
     },
     runningMode,
+    outputFaceBlendshapes: true,
     numFaces: 1
   });
   demosSection.classList.remove('invisible');
@@ -103,6 +107,7 @@ async function handleClick(event) {
     drawConnectors(cxt, landmarks, FACEMESH_FACE_OVAL, {color: '#E0E0E0'});
     drawConnectors(cxt, landmarks, FACEMESH_LIPS, {color: '#E0E0E0'});
   }
+  drawBlendShapes(imageBlendShapes, faceLandmarkerResult.faceBlendshapes);
 }
 
 /********************************************************************
@@ -184,9 +189,27 @@ async function predictWebcam() {
     }
   }
   canvasCtx.restore();
+  drawBlendShapes(videoBlendShapes, results.faceBlendshapes);
 
   // Call this function again to keep predicting when the browser is ready.
   if (webcamRunning === true) {
     window.requestAnimationFrame(predictWebcam);
   }
+}
+
+function drawBlendShapes(el: HTMLElement, blendShapes: any[]) {
+
+  if (!blendShapes[0].categories?.length) { return };
+
+  let htmlMaker = '';
+  blendShapes[0].categories.map((shape) => {
+    htmlMaker += `
+      <li class="blend-shapes-item">
+        <span class="blend-shapes-label">${shape.displayName || shape.categoryName}</span>
+        <span class="blend-shapes-value" style="width: calc(${+shape.score * 100}% - 120px)">${(+shape.score).toFixed(4)}</span>
+      </li>
+    `;
+  });
+
+  el.innerHTML = htmlMaker;
 }
