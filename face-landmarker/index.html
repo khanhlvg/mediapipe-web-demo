@@ -1,4 +1,4 @@
-<!-- Copyright 2022 The MediaPipe Authors.
+<!-- Copyright 2023 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -11,10 +11,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. -->
-<!doctype html>
 <html>
 <head>
-  <!-- <base href="/"> -->
   <meta charset="utf-8">
   <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
@@ -23,7 +21,6 @@ limitations under the License. -->
 
   <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-
   <link href="style.css" rel="stylesheet">
 </head>
 <body>
@@ -49,8 +46,8 @@ limitations under the License. -->
         <span class="mdc-button__label">ENABLE WEBCAM</span>
       </button>
       <div style="position: relative;">
-        <video id="webcam" style="width: 1280px; height: 720px; position: abso" autoplay playsinline></video>
-        <canvas class="output_canvas" id="output_canvas" width="1280" height="720" style="position: absolute; left: 0px; top: 0px;"></canvas>
+        <video id="webcam" style="position: abso" autoplay playsinline></video>
+        <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
       </div>
     </div>
     <div class="blend-shapes">
