@@ -30,7 +30,7 @@ async function runDemo() {
   const vision = await FilesetResolver.forVisionTasks("/wasm");
   faceStylizer = await FaceStylizer.createFromOptions(vision, {
     baseOptions: {
-      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_stylizer/blaze_face_stylizer/float32/1/blaze_face_stylizer.task`
+      modelAssetPath: `https://storage.googleapis.com/mediapipe-assets/face_stylizer_cartoon.task`
     }
   });
   demosSection.classList.remove("invisible");
@@ -64,7 +64,7 @@ async function handleClick(event) {
     runningMode = "IMAGE";
     await faceStylizer.setOptions({ runningMode });
   }
-  // Remove all landmarks drawed before
+  // Remove all face styles drawed before
   const allCanvas = event.target.parentNode.getElementsByClassName("canvas");
   for (var i = allCanvas.length - 1; i >= 0; i--) {
     const n = allCanvas[i];
