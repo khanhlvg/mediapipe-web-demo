@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FaceStylizer, FilesetResolver } from '@mediapipe/tasks-vision';
+import { FaceStylizer, FilesetResolver, MPImage } from '@mediapipe/tasks-vision';
 
 const demosSection = document.getElementById("demos");
 
@@ -30,7 +30,8 @@ async function runDemo() {
   const vision = await FilesetResolver.forVisionTasks("/wasm");
   faceStylizer = await FaceStylizer.createFromOptions(vision, {
     baseOptions: {
-      modelAssetPath: `https://storage.googleapis.com/mediapipe-assets/face_stylizer_cartoon.task`
+      // modelAssetPath: `https://storage.googleapis.com/mediapipe-assets/face_stylizer_cartoon.task`
+      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_stylizer/blaze_face_stylizer/float32/1/blaze_face_stylizer.task`
     }
   });
   demosSection.classList.remove("invisible");
@@ -45,7 +46,7 @@ runDemo();
 // In this demo, we have put all our clickable images in divs with the
 // CSS class 'detectionOnClick'. Lets get all the elements that have
 // this class.
-const imageContainers = document.getElementsByClassName("detectOnClick");
+const imageContainers = document.getElementsByClassName("detectOnClick") as HTMLCollectionOf<HTMLDivElement>;
 
 // Now let's go through all of these and add a click event listener.
 for (let i = 0; i < imageContainers.length; i++) {
@@ -80,7 +81,7 @@ async function handleClick(event) {
   canvas.setAttribute("class", "canvas");
   canvas.setAttribute("width", event.target.naturalWidth + "px");
   canvas.setAttribute("height", event.target.naturalHeight + "px");
-  canvas.style.left = "0px";
+  canvas.style.left = "calc(100% + 16px)";
   canvas.style.top = "0px";
   canvas.style.width = `${event.target.width}px`;
   canvas.style.height = `${event.target.height}px`;
@@ -110,9 +111,7 @@ function hasGetUserMedia() {
 // If webcam supported, add event listener to button for when user
 // wants to activate it.
 if (hasGetUserMedia()) {
-  enableWebcamButton = document.getElementById(
-    "webcamButton"
-  ) as HTMLButtonElement;
+  enableWebcamButton = document.getElementById("webcamButton") as HTMLButtonElement;
   enableWebcamButton.addEventListener("click", enableCam);
 } else {
   console.warn("getUserMedia() is not supported by your browser");
@@ -127,26 +126,25 @@ function enableCam(event) {
 
   if (webcamRunning === true) {
     webcamRunning = false;
-    enableWebcamButton.innerText = "ENABLE PREDICTIONS";
+    enableWebcamButton.innerText = "RUN WEBCAM";
+    video.pause();
+    predictWebcam()
   } else {
     webcamRunning = true;
-    enableWebcamButton.innerText = "DISABLE PREDICTIONS";
+    enableWebcamButton.innerText = "PAUSE AND STYLIZE";
+    
+    if (video.paused && video.played.length > 0) {
+      video.play();
+    } else {
+      // Activate the webcam stream.
+      navigator.mediaDevices.getUserMedia({video: true}).then(function (stream) {
+        video.srcObject = stream;
+      });
+    }
   }
-
-  // getUsermedia parameters.
-  const constraints = {
-    video: true
-  };
-
-  // Activate the webcam stream.
-  navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-    video.srcObject = stream;
-    video.addEventListener("loadeddata", predictWebcam);
-  });
 }
 
 let lastVideoTime = -1;
-let results = undefined;
 
 async function predictWebcam() {
   // Now let's start detecting the stream.
@@ -154,20 +152,18 @@ async function predictWebcam() {
     runningMode = "VIDEO";
     await faceStylizer.setOptions({ runningMode });
   }
-  let nowInMs = Date.now();
-  if (lastVideoTime !== video.currentTime) {
+  const startTimeMs = performance.now();
+  const callback = (image: MPImage) => {
+    if (image) {
+      canvasElement.width = image.width;
+      canvasElement.height = image.height;
+      canvasCtx.putImageData(image.getAsImageData(), 0, 0);
+    }
+  }
+
+  // Stylize when Pause video
+  if (!webcamRunning && lastVideoTime !== video.currentTime) {
     lastVideoTime = video.currentTime;
-    results = faceStylizer.stylizeForVideo(video, nowInMs);
-  }
-
-  if (results) {
-    canvasElement.width = results.width;
-    canvasElement.height = results.height;
-    canvasCtx.putImageData(results.getAsImageData(), 0, 0);
-  }
-
-  // Call this function again to keep predicting when the browser is ready.
-  if (webcamRunning === true) {
-    window.requestAnimationFrame(predictWebcam);
+    faceStylizer.stylizeForVideo(video, startTimeMs, callback);
   }
 }

@@ -81,11 +81,10 @@ footer {
 }
 
 .videoView,
-.detectOnClick,
-.blend-shapes {
+.detectOnClick {
   position: relative;
   float: left;
-  width: 48%;
+  width: 50%;
   margin: 2% 1%;
   cursor: pointer;
 }
