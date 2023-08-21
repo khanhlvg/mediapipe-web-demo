@@ -39,14 +39,14 @@ async function runDemo() {
 runDemo();
 
 /********************************************************************
-// Demo 1: Grab a bunch of images from the page and detection them
+// Demo 1: Grab a bunch of images from the page and stylize them
 // upon click.
 ********************************************************************/
 
 // In this demo, we have put all our clickable images in divs with the
-// CSS class 'detectionOnClick'. Lets get all the elements that have
+// CSS class 'stylizeOnClick'. Lets get all the elements that have
 // this class.
-const imageContainers = document.getElementsByClassName("detectOnClick") as HTMLCollectionOf<HTMLDivElement>;
+const imageContainers = document.getElementsByClassName("stylizeOnClick") as HTMLCollectionOf<HTMLDivElement>;
 
 // Now let's go through all of these and add a click event listener.
 for (let i = 0; i < imageContainers.length; i++) {
@@ -54,7 +54,7 @@ for (let i = 0; i < imageContainers.length; i++) {
   imageContainers[i].children[0].addEventListener("click", handleClick);
 }
 
-// When an image is clicked, let's detect it and display results!
+// When an image is clicked, let's stylize it and display results!
 async function handleClick(event) {
   if (!faceStylizer) {
     console.log("Wait for faceStylizer to load before clicking!");
@@ -93,7 +93,7 @@ async function handleClick(event) {
 }
 
 /********************************************************************
-// Demo 2: Continuously grab image from webcam stream and detect it.
+// Demo 2: Continuously grab image from webcam stream and stylize it.
 ********************************************************************/
 
 const video = document.getElementById("webcam") as HTMLVideoElement;
@@ -117,7 +117,7 @@ if (hasGetUserMedia()) {
   console.warn("getUserMedia() is not supported by your browser");
 }
 
-// Enable the live webcam view and start detection.
+// Enable the live webcam view and start stylization.
 function enableCam(event) {
   if (!faceStylizer) {
     console.log("Wait! faceStylizer not loaded yet.");
@@ -147,7 +147,7 @@ function enableCam(event) {
 let lastVideoTime = -1;
 
 async function predictWebcam() {
-  // Now let's start detecting the stream.
+  // Now let's start stylizing the stream.
   if (runningMode === "IMAGE") {
     runningMode = "VIDEO";
     await faceStylizer.setOptions({ runningMode });

@@ -81,7 +81,7 @@ footer {
 }
 
 .videoView,
-.detectOnClick {
+.stylizeOnClick {
   position: relative;
   float: left;
   width: 50%;
@@ -90,7 +90,7 @@ footer {
 }
 
 .videoView p,
-.detectOnClick p {
+.stylizeOnClick p {
   position: absolute;
   padding: 5px;
   background-color: #007f8b;
@@ -123,10 +123,10 @@ footer {
   -moz-transform: rotateY(180deg);
 }
 
-.detectOnClick {
+.stylizeOnClick {
   z-index: 0;
 }
 
-.detectOnClick img {
+.stylizeOnClick img {
   width: 100%;
 }
