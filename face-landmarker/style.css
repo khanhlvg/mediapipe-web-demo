@@ -115,7 +115,10 @@ footer {
   pointer-events: none;
 }
 
-.output_canvas {
+.output-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
@@ -127,6 +130,14 @@ footer {
 
 .detectOnClick img {
   width: 100%;
+}
+
+.image-output-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
 }
 
 .blend-shapes-item {

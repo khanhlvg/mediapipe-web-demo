@@ -26,12 +26,13 @@ limitations under the License. -->
 <body>
   <h1>Face landmark detection using the MediaPipe FaceLandmarker task</h1>
 
-  <section id="demos" class="invisible">
+  <section id="demos">
     <h2>Demo: Detecting Images</h2>
     <p><b>Click on an image below</b> to see the key landmarks of the face.</p>
 
     <div class="detectOnClick">
       <img src="https://storage.googleapis.com/mediapipe-assets/portrait.jpg" width="100%" crossorigin="anonymous" title="Click to get detection!" />
+      <canvas class="image-output-canvas" id="image-output-canvas"></canvas>
     </div>
     <div class="blend-shapes">
       <ul class="blend-shapes-list" id="image-blend-shapes"></ul>
@@ -47,7 +48,7 @@ limitations under the License. -->
       </button>
       <div style="position: relative;">
         <video id="webcam" style="position: abso" autoplay playsinline></video>
-        <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
+        <canvas class="output-canvas" id="output-canvas"></canvas>
       </div>
     </div>
     <div class="blend-shapes">
