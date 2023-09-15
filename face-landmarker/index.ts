@@ -35,19 +35,6 @@ worker.onmessage = (e) => {
   }
 };
 
-function createImageData(object, width?: number, height?: number) {
-  const canvasForWorker = document.createElement('canvas');
-  canvasForWorker.style.width = `${width || object.clientWidth}px`;
-  canvasForWorker.style.height = `${height || object.clientHeight}px`;
-  canvasForWorker.width = width || object.clientWidth;
-  canvasForWorker.height = height || object.clientHeight;
-
-  const canvasCtxforWorker = canvasForWorker.getContext('2d');
-  canvasCtxforWorker.drawImage(object, 0, 0, canvasForWorker.width, canvasForWorker.height);
-
-  return canvasCtxforWorker.getImageData(0, 0, canvasForWorker.width, canvasForWorker.height);
-}
-
 /********************************************************************
 // Demo 1: Grab a bunch of images from the page and detection them
 // upon click.
@@ -68,10 +55,10 @@ for (let i = 0; i < imageContainers.length; i++) {
 async function handleClick(event) {
   const imageEl = event.target as HTMLImageElement;
 
-  const imageData = createImageData(imageEl);
+  const imageBitmap = await createImageBitmap(imageEl, 0, 0, imageEl.clientWidth, imageEl.clientHeight);
   worker.postMessage({
     mode: 'IMAGE',
-    imageData
+    imageBitmap
   });
 }
 
@@ -115,7 +102,7 @@ function enableCam() {
 }
 
 let lastVideoTime = -1;
-const detectLoop = () => {
+const detectLoop = async () => {
   if (!webcamRunning) {
     return;
   }
@@ -126,10 +113,10 @@ const detectLoop = () => {
     video.style.width = `${videoWidth}px`;
     video.style.height = `${videoWidth * ratio}px`;
     
-    const imageData = createImageData(video, videoWidth, videoWidth * ratio);
+    const imageBitmap = await createImageBitmap(video, 0, 0, videoWidth, videoWidth * ratio);
     worker.postMessage({
       mode: 'VIDEO',
-      imageData
+      imageBitmap
     });
   }
   setTimeout(() => {

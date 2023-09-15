@@ -17,11 +17,15 @@ FaceLandmarker.createFromOptions(
     detector = d;
 });
 
-const ctx: Worker = self as any;
+const ctx = self;
 ctx.addEventListener('message', (e) => {
   if (detector && e?.data) {
-    const results = detector.detect(e.data.imageData);
-    (postMessage as any)({
+    const timeMs = performance.now()
+    const results = e.data.mode === 'VIDEO'
+      ? detector.detectForVideo(e.data.imageData, timeMs)
+      : detector.detect(e.data.imageData)
+
+    postMessage({
       mode: e.data.mode,
       results
     });
