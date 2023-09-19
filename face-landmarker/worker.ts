@@ -20,10 +20,7 @@ FaceLandmarker.createFromOptions(
 const ctx = self;
 ctx.addEventListener('message', (e) => {
   if (detector && e?.data) {
-    const timeMs = performance.now()
-    const results = e.data.mode === 'VIDEO'
-      ? detector.detectForVideo(e.data.imageData, timeMs)
-      : detector.detect(e.data.imageData)
+    const results = detector.detect(e.data.imageBitmap);
 
     postMessage({
       mode: e.data.mode,

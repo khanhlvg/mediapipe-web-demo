@@ -55,7 +55,7 @@ for (let i = 0; i < imageContainers.length; i++) {
 async function handleClick(event) {
   const imageEl = event.target as HTMLImageElement;
 
-  const imageBitmap = await createImageBitmap(imageEl, 0, 0, imageEl.clientWidth, imageEl.clientHeight);
+  const imageBitmap = await createImageBitmap(imageEl);
   worker.postMessage({
     mode: 'IMAGE',
     imageBitmap
@@ -113,7 +113,7 @@ const detectLoop = async () => {
     video.style.width = `${videoWidth}px`;
     video.style.height = `${videoWidth * ratio}px`;
     
-    const imageBitmap = await createImageBitmap(video, 0, 0, videoWidth, videoWidth * ratio);
+    const imageBitmap = await createImageBitmap(video);
     worker.postMessage({
       mode: 'VIDEO',
       imageBitmap
