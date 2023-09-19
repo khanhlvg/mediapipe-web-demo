@@ -12,38 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import { FaceLandmarker, DrawingUtils } from '@mediapipe/tasks-vision';
+import FaceLandmarkWorker from 'worker-loader!./Worker';
 
-const demosSection = document.getElementById("demos");
 const imageBlendShapes = document.getElementById("image-blend-shapes");
 const videoBlendShapes = document.getElementById("video-blend-shapes");
 
-let faceLandmarker;
-let runningMode: "IMAGE" | "VIDEO" = "IMAGE";
-let enableWebcamButton: HTMLButtonElement;
-let webcamRunning: Boolean = false;
-const videoWidth = 480;
+const worker = new FaceLandmarkWorker;
+worker.onmessage = (e) => {
+  if (e?.data) {
+    const { results, mode } = e.data;
+    if (mode === 'VIDEO') {
+      drawLandmarks(results, canvasElement, video.clientWidth, video.clientHeight);
+      drawBlendShapes(videoBlendShapes, results.faceBlendshapes);
+    } else {
+      const canvas = document.querySelector('#image-output-canvas') as HTMLCanvasElement;
+      const parentEl = canvas.parentElement;
 
-// Before we can use HandLandmarker class we must wait for it to finish
-// loading. Machine Learning models can be large and take a moment to
-// get everything needed to run.
-async function runDemo() {
-  // Read more `CopyWebpackPlugin`, copy wasm set from "https://cdn.skypack.dev/node_modules" to `/wasm`
-  const filesetResolver = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
-  );
-  faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
-    baseOptions: {
-      modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-      delegate: "GPU"
-    },
-    outputFaceBlendshapes: true,
-    runningMode,
-    numFaces: 1
-  });
-  demosSection.classList.remove("invisible");
-}
-runDemo();
+      drawLandmarks(results, canvas, parentEl.clientWidth, parentEl.clientHeight);
+      drawBlendShapes(imageBlendShapes, results.faceBlendshapes);
+    }
+  }
+};
 
 /********************************************************************
 // Demo 1: Grab a bunch of images from the page and detection them
@@ -53,131 +43,49 @@ runDemo();
 // In this demo, we have put all our clickable images in divs with the
 // CSS class 'detectionOnClick'. Lets get all the elements that have
 // this class.
-const imageContainers = document.getElementsByClassName("detectOnClick");
+const imageContainers = document.getElementsByClassName('detectOnClick');
 
 // Now let's go through all of these and add a click event listener.
 for (let i = 0; i < imageContainers.length; i++) {
   // Add event listener to the child element whichis the img element.
-  imageContainers[i].children[0].addEventListener("click", handleClick);
+  imageContainers[i].children[0].addEventListener('click', handleClick);
 }
 
 // When an image is clicked, let's detect it and display results!
 async function handleClick(event) {
-  if (!faceLandmarker) {
-    console.log("Wait for faceLandmarker to load before clicking!");
-    return;
-  }
+  const imageEl = event.target as HTMLImageElement;
 
-  if (runningMode === "VIDEO") {
-    runningMode = "IMAGE";
-    await faceLandmarker.setOptions({ runningMode });
-  }
-  // Remove all landmarks drawed before
-  const allCanvas = event.target.parentNode.getElementsByClassName("canvas");
-  for (var i = allCanvas.length - 1; i >= 0; i--) {
-    const n = allCanvas[i];
-    n.parentNode.removeChild(n);
-  }
-
-  // We can call faceLandmarker.detect as many times as we like with
-  // different image data each time. This returns a promise
-  // which we wait to complete and then call a function to
-  // print out the results of the prediction.
-  const faceLandmarkerResult = faceLandmarker.detect(event.target);
-  const canvas = document.createElement("canvas") as HTMLCanvasElement;
-  canvas.setAttribute("class", "canvas");
-  canvas.setAttribute("width", event.target.naturalWidth + "px");
-  canvas.setAttribute("height", event.target.naturalHeight + "px");
-  canvas.style.left = "0px";
-  canvas.style.top = "0px";
-  canvas.style.width = `${event.target.width}px`;
-  canvas.style.height = `${event.target.height}px`;
-
-  event.target.parentNode.appendChild(canvas);
-  const ctx = canvas.getContext("2d");
-  const drawingUtils = new DrawingUtils(ctx);
-  for (const landmarks of faceLandmarkerResult.faceLandmarks) {
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_TESSELATION,
-      { color: "#C0C0C070", lineWidth: 1 }
-    );
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE,
-      { color: "#FF3030" }
-    );
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW,
-      { color: "#FF3030" }
-    );
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_LEFT_EYE,
-      { color: "#30FF30" }
-    );
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW,
-      { color: "#30FF30" }
-    );
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
-      { color: "#E0E0E0" }
-    );
-    drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS, {
-      color: "#E0E0E0"
-    });
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_RIGHT_IRIS,
-      { color: "#FF3030" }
-    );
-    drawingUtils.drawConnectors(
-      landmarks,
-      FaceLandmarker.FACE_LANDMARKS_LEFT_IRIS,
-      { color: "#30FF30" }
-    );
-  }
-  drawBlendShapes(imageBlendShapes, faceLandmarkerResult.faceBlendshapes);
+  const imageBitmap = await createImageBitmap(imageEl);
+  worker.postMessage({
+    mode: 'IMAGE',
+    imageBitmap
+  });
 }
 
 /********************************************************************
 // Demo 2: Continuously grab image from webcam stream and detect it.
 ********************************************************************/
+const video = document.getElementById('webcam') as HTMLVideoElement;
+const canvasElement = document.getElementById('output-canvas') as HTMLCanvasElement;
 
-const video = document.getElementById("webcam") as HTMLVideoElement;
-const canvasElement = document.getElementById(
-  "output_canvas"
-) as HTMLCanvasElement;
-
-const canvasCtx = canvasElement.getContext("2d");
+const videoWidth = 480;
+let enableWebcamButton: HTMLButtonElement;
+let webcamRunning = false;
 
 // Check if webcam access is supported.
 function hasGetUserMedia() {
   return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 }
-
-// If webcam supported, add event listener to button for when user
-// wants to activate it.
+// If webcam supported, add event listener to button for when user wants to activate it.
 if (hasGetUserMedia()) {
-  enableWebcamButton = document.getElementById(
-    "webcamButton"
-  ) as HTMLButtonElement;
-  enableWebcamButton.addEventListener("click", enableCam);
+  enableWebcamButton = document.getElementById('webcamButton') as HTMLButtonElement;
+  enableWebcamButton.addEventListener('click', enableCam);
 } else {
   console.warn("getUserMedia() is not supported by your browser");
 }
 
 // Enable the live webcam view and start detection.
-function enableCam(event) {
-  if (!faceLandmarker) {
-    console.log("Wait! faceLandmarker not loaded yet.");
-    return;
-  }
-
+function enableCam() {
   if (webcamRunning === true) {
     webcamRunning = false;
     enableWebcamButton.innerText = "ENABLE PREDICTIONS";
@@ -186,40 +94,49 @@ function enableCam(event) {
     enableWebcamButton.innerText = "DISABLE PREDICTIONS";
   }
 
-  // getUsermedia parameters.
-  const constraints = {
-    video: true
-  };
-
   // Activate the webcam stream.
-  navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+  navigator.mediaDevices.getUserMedia({video: true}).then(function (stream) {
     video.srcObject = stream;
-    video.addEventListener("loadeddata", predictWebcam);
+    video.addEventListener("loadeddata", detectLoop);
   });
 }
 
 let lastVideoTime = -1;
-let results = undefined;
-const drawingUtils = new DrawingUtils(canvasCtx);
-async function predictWebcam() {
-  const radio = video.videoHeight / video.videoWidth;
-  video.style.width = videoWidth + "px";
-  video.style.height = videoWidth * radio + "px";
-  canvasElement.style.width = videoWidth + "px";
-  canvasElement.style.height = videoWidth * radio + "px";
-  canvasElement.width = video.videoWidth;
-  canvasElement.height = video.videoHeight;
-  // Now let's start detecting the stream.
-  if (runningMode === "IMAGE") {
-    runningMode = "VIDEO";
-    await faceLandmarker.setOptions({ runningMode: runningMode });
+const detectLoop = async () => {
+  if (!webcamRunning) {
+    return;
   }
-  let nowInMs = Date.now();
-  if (lastVideoTime !== video.currentTime) {
+  if (video.currentTime !== lastVideoTime) {
     lastVideoTime = video.currentTime;
-    results = faceLandmarker.detectForVideo(video, nowInMs);
+
+    const ratio = video.videoHeight / video.videoWidth;
+    video.style.width = `${videoWidth}px`;
+    video.style.height = `${videoWidth * ratio}px`;
+    
+    const imageBitmap = await createImageBitmap(video);
+    worker.postMessage({
+      mode: 'VIDEO',
+      imageBitmap
+    });
   }
+  setTimeout(() => {
+    requestAnimationFrame(() => {
+      detectLoop();
+    });
+  }, 30);
+};
+
+function drawLandmarks(results, canvas: HTMLCanvasElement, width: number, height: number) {
   if (results.faceLandmarks) {
+    // Set canvas width-height
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Draw landmarks
+    const ctx = canvas.getContext('2d');
+    const drawingUtils = new DrawingUtils(ctx);
     for (const landmarks of results.faceLandmarks) {
       drawingUtils.drawConnectors(
         landmarks,
@@ -267,12 +184,6 @@ async function predictWebcam() {
         { color: "#30FF30" }
       );
     }
-  }
-  drawBlendShapes(videoBlendShapes, results.faceBlendshapes);
-
-  // Call this function again to keep predicting when the browser is ready.
-  if (webcamRunning === true) {
-    window.requestAnimationFrame(predictWebcam);
   }
 }
 
